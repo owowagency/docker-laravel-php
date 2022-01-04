@@ -34,6 +34,8 @@ RUN docker-php-ext-install \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+ENV PHP_MEMORY_LIMIT=512M
+
 ENV NODE_VERSION=12.18.3
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 ENV NVM_DIR=/root/.nvm
