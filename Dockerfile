@@ -25,6 +25,7 @@ RUN docker-php-ext-configure \
 RUN docker-php-ext-install \
     exif \
     -j$(nproc) \
+    bcmath \
     gd \
     intl \
     pdo \
