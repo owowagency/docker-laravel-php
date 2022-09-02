@@ -31,7 +31,11 @@ RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
     soap \
-    zip
+    zip \
+    calendar
+
+RUN docker-php-ext-configure \
+    calendar
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
