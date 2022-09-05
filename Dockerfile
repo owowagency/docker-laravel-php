@@ -11,13 +11,11 @@ RUN apt-get update && apt-get install -y \
 
 RUN pecl install \
     redis \
-    imagick \
-    xdebug
+    imagick
 
 RUN docker-php-ext-enable \
     redis \
-    imagick \
-    xdebug
+    imagick
 
 RUN docker-php-ext-configure \
     gd --with-freetype --with-jpeg
@@ -52,6 +50,3 @@ RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
 ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN npm install -g yarn
-
-RUN echo "xdebug.mode = debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN echo "xdebug.client_host = host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
