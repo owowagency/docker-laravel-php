@@ -10,17 +10,20 @@ RUN apt-get update && apt-get install -y \
     unzip
 
 RUN pecl install \
-    redis
+    redis \
+    imagick \
+    xdebug
 
 RUN docker-php-ext-enable \
-    redis
-
-RUN mkdir -p /usr/src/php/ext/imagick; \
-    curl -fsSL https://github.com/Imagick/imagick/archive/06116aa24b76edaf6b1693198f79e6c295eda8a9.tar.gz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1; \
-    docker-php-ext-install imagick;
+    redis \
+    imagick \
+    xdebug
 
 RUN docker-php-ext-configure \
     gd --with-freetype --with-jpeg
+
+RUN docker-php-ext-configure \
+    calendar
 
 RUN docker-php-ext-install \
     exif \
@@ -34,9 +37,6 @@ RUN docker-php-ext-install \
     zip \
     calendar
 
-RUN docker-php-ext-configure \
-    calendar
-
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 ENV PHP_MEMORY_LIMIT=512M
@@ -44,7 +44,7 @@ ENV PHP_MEMORY_LIMIT=512M
 RUN cd /usr/local/etc/php/conf.d/ && \
   echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memory-limit.ini
 
-ENV NODE_VERSION=12.18.3
+ENV NODE_VERSION=16.17.0
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 ENV NVM_DIR=/root/.nvm
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
@@ -52,3 +52,6 @@ RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
 ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN npm install -g yarn
+
+RUN echo "xdebug.mode = debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN echo "xdebug.client_host = host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
