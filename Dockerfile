@@ -42,7 +42,7 @@ ENV PHP_MEMORY_LIMIT=512M
 RUN cd /usr/local/etc/php/conf.d/ && \
   echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memory-limit.ini
 
-ENV NODE_VERSION=16.15.1
+ENV NODE_VERSION=16.17.0
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 ENV NVM_DIR=/root/.nvm
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
