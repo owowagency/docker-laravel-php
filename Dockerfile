@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y \
     libmcrypt-dev \
     libpng-dev \
     libzip-dev \
-    unzip
+    unzip \
+    ffmpeg
 
 RUN pecl install \
     redis \
