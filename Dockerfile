@@ -1,4 +1,4 @@
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
@@ -25,6 +25,9 @@ RUN docker-php-ext-configure \
 RUN docker-php-ext-configure \
     calendar
 
+RUN docker-php-ext-configure \
+    pcntl --enable-pcntl
+
 RUN docker-php-ext-install \
     exif \
     -j$(nproc) \
@@ -35,7 +38,8 @@ RUN docker-php-ext-install \
     pdo_mysql \
     soap \
     zip \
-    calendar
+    calendar \
+    pcntl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
