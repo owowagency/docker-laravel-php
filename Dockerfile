@@ -10,14 +10,16 @@ RUN apt-get update && apt-get install -y \
     unzip \
     ffmpeg
 
+# Imagick for php8.3 is broken right now, see https://github.com/Imagick/imagick/pull/641
+
 RUN pecl install \
     redis \
-    imagick \
+    # imagick \
     xdebug
 
 RUN docker-php-ext-enable \
     redis \
-    imagick \
+    # imagick \
     xdebug
 
 RUN docker-php-ext-configure \
@@ -45,9 +47,7 @@ RUN docker-php-ext-install \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 ENV PHP_MEMORY_LIMIT=512M
-
-RUN cd /usr/local/etc/php/conf.d/ && \
-  echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memory-limit.ini
+RUN echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memory-limit.ini
 
 ENV NODE_VERSION=20.10.0
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
