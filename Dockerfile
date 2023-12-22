@@ -24,6 +24,8 @@ RUN docker-php-ext-enable \
 
 # So for now we need to build imagick from source
 
+RUN apt-get install -y git
+
 RUN git clone https://github.com/Imagick/imagick.git --depth 1 /tmp/imagick && \
     cd /tmp/imagick && \
     phpize && \
