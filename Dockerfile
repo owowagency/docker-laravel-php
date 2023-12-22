@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
@@ -10,15 +10,30 @@ RUN apt-get update && apt-get install -y \
     unzip \
     ffmpeg
 
+# Imagick for php8.3 is broken right now, see https://github.com/Imagick/imagick/pull/641
+
 RUN pecl install \
     redis \
-    imagick \
+    # imagick \
     xdebug
 
 RUN docker-php-ext-enable \
     redis \
-    imagick \
+    # imagick \
     xdebug
+
+# So for now we need to build imagick from source
+
+RUN apt-get install -y git
+
+RUN git clone https://github.com/Imagick/imagick.git --depth 1 /tmp/imagick && \
+    cd /tmp/imagick && \
+    phpize && \
+    ./configure && \
+    make && \
+    make install
+
+RUN docker-php-ext-enable imagick
 
 RUN docker-php-ext-configure \
     gd --with-freetype --with-jpeg
@@ -43,20 +58,3 @@ RUN docker-php-ext-install \
     pcntl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-ENV PHP_MEMORY_LIMIT=512M
-
-RUN cd /usr/local/etc/php/conf.d/ && \
-  echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memory-limit.ini
-
-ENV NODE_VERSION=16.17.0
-RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
-ENV NVM_DIR=/root/.nvm
-RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
-ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
-RUN npm install -g yarn
-
-RUN echo "xdebug.mode = debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN echo "xdebug.client_host = host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
