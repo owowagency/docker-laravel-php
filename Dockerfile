@@ -22,6 +22,17 @@ RUN docker-php-ext-enable \
     # imagick \
     xdebug
 
+# So for now we need to build imagick from source
+
+RUN git clone https://github.com/Imagick/imagick.git --depth 1 /tmp/imagick && \
+    cd /tmp/imagick && \
+    phpize && \
+    ./configure && \
+    make && \
+    make install
+
+RUN docker-php-ext-enable imagick
+
 RUN docker-php-ext-configure \
     gd --with-freetype --with-jpeg
 
