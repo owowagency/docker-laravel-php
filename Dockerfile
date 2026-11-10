@@ -1,4 +1,12 @@
-FROM php:8.3-fpm
+# PHP 8.0.30 is the final PHP 8.0 release and only ships on Debian 11 (bullseye).
+FROM php:8.0.30-fpm-bullseye
+
+# Debian 11 is end-of-life; its packages now live on archive.debian.org.
+RUN printf '%s\n' \
+        'deb http://archive.debian.org/debian bullseye main' \
+        'deb http://archive.debian.org/debian-security bullseye-security main' \
+        > /etc/apt/sources.list \
+    && rm -f /etc/apt/sources.list.d/*
 
 RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
@@ -8,32 +16,21 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libzip-dev \
     unzip \
-    ffmpeg
+    git \
+    ffmpeg \
+    default-mysql-client \
+    && rm -rf /var/lib/apt/lists/*
 
-# Imagick for php8.3 is broken right now, see https://github.com/Imagick/imagick/pull/641
-
+# Pin the last PECL releases that still support PHP 8.0.
 RUN pecl install \
-    redis \
-    # imagick \
-    xdebug
+    redis-6.0.2 \
+    imagick-3.7.0 \
+    xdebug-3.3.2
 
 RUN docker-php-ext-enable \
     redis \
-    # imagick \
+    imagick \
     xdebug
-
-# So for now we need to build imagick from source
-
-RUN apt-get install -y git
-
-RUN git clone https://github.com/Imagick/imagick.git --depth 1 /tmp/imagick && \
-    cd /tmp/imagick && \
-    phpize && \
-    ./configure && \
-    make && \
-    make install
-
-RUN docker-php-ext-enable imagick
 
 RUN docker-php-ext-configure \
     gd --with-freetype --with-jpeg
@@ -55,6 +52,7 @@ RUN docker-php-ext-install \
     soap \
     zip \
     calendar \
-    pcntl
+    pcntl \
+    opcache
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
